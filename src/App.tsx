@@ -8,6 +8,7 @@ import { FitnessProvider } from "./contexts/FitnessContext";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import DietTracker from "./pages/DietTracker";
 import WorkoutTracker from "./pages/WorkoutTracker";
@@ -18,9 +19,20 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+  // Check if onboarding done
+  const onboarded = user ? localStorage.getItem(`fitgrad_onboarded_${user.id}`) : null;
+  if (!onboarded) return <Navigate to="/onboarding" replace />;
   return <AppLayout>{children}</AppLayout>;
+}
+
+function OnboardingRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, user } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  const onboarded = user ? localStorage.getItem(`fitgrad_onboarded_${user.id}`) : null;
+  if (onboarded) return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
 }
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
@@ -41,6 +53,7 @@ const App = () => (
               <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
               <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
               <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+              <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/diet" element={<ProtectedRoute><DietTracker /></ProtectedRoute>} />
               <Route path="/workout" element={<ProtectedRoute><WorkoutTracker /></ProtectedRoute>} />
