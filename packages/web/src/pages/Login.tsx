@@ -11,13 +11,18 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(email, password)) {
-      toast.success('Welcome back!');
-      navigate('/dashboard');
-    } else {
-      toast.error('Invalid email or password');
+    try {
+      const result = await login(email, password);
+      if (result) {
+        toast.success('Welcome back!');
+        navigate('/onboarding', { replace: true });
+      } else {
+        toast.error('Invalid email or password');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Login failed');
     }
   };
 

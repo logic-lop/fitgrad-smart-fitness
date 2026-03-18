@@ -12,17 +12,22 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.length < 6) {
       toast.error('Password must be at least 6 characters');
       return;
     }
-    if (register(name, email, password)) {
-      toast.success('Account created! Let\'s set up your profile.');
-      navigate('/profile');
-    } else {
-      toast.error('An account with this email already exists');
+    try {
+      const result = await register(name, email, password);
+      if (result) {
+        toast.success('Account created! Let\'s set up your profile.');
+        navigate('/onboarding', { replace: true });
+      } else {
+        toast.error('An account with this email already exists');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Registration failed');
     }
   };
 
