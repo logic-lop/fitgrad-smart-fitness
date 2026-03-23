@@ -99,7 +99,12 @@
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 }
@@ -108,22 +113,28 @@
   .gradient-primary {
     background: var(--gradient-primary);
   }
+
   .gradient-secondary {
     background: var(--gradient-secondary);
   }
+
   .gradient-hero {
     background: var(--gradient-hero);
   }
+
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
+
   .shadow-elevated {
     box-shadow: var(--shadow-elevated);
   }
+
   .glass {
     backdrop-filter: blur(12px);
     background: hsl(0 0% 100% / 0.8);
   }
+
   .dark .glass {
     background: hsl(220 25% 8% / 0.8);
   }
