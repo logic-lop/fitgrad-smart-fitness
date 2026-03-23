@@ -15,11 +15,14 @@ export default function Dashboard() {
   const caloriesIn = getTodayCaloriesIn();
   const caloriesBurned = getTodayCaloriesBurned();
   const netCalories = caloriesIn - caloriesBurned;
-  const bmi = (user.weight / ((user.height / 100) ** 2)).toFixed(1);
+  const userWeight = user.weight || 65;
+  const userHeight = user.height || 170;
+  const bmi = (userWeight / ((userHeight / 100) ** 2)).toFixed(1);
   const weeklyData = getWeeklyData();
   const activeDays = getActiveDays();
 
-  const calorieProgress = Math.min(100, Math.round((caloriesIn / user.dailyCalorieTarget) * 100));
+  const calorieTarget = user.dailyCalorieTarget || 2200;
+  const calorieProgress = Math.min(100, Math.round((caloriesIn / calorieTarget) * 100));
   const burnProgress = Math.min(100, Math.round((caloriesBurned / 500) * 100)); // 500 kcal daily burn goal
   const weeklyWorkouts = workoutEntries.filter(w => {
     const d = new Date(); d.setDate(d.getDate() - 7);
@@ -73,7 +76,7 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Calories In" value={caloriesIn} subtitle={`Target: ${user.dailyCalorieTarget} kcal`} icon={Apple} variant="primary" />
+        <StatCard title="Calories In" value={caloriesIn} subtitle={`Target: ${calorieTarget} kcal`} icon={Apple} variant="primary" />
         <StatCard title="Calories Burned" value={caloriesBurned} subtitle="Today's activity" icon={Flame} variant="secondary" />
         <StatCard title="Net Calories" value={netCalories} subtitle={netCalories > 0 ? 'Surplus' : 'Deficit'} icon={Activity} variant="accent" />
         <StatCard title="BMI" value={bmi} subtitle={Number(bmi) < 18.5 ? 'Underweight' : Number(bmi) < 25 ? 'Normal' : Number(bmi) < 30 ? 'Overweight' : 'Obese'} icon={Scale} />
@@ -84,7 +87,7 @@ export default function Dashboard() {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-border bg-card p-6 shadow-card">
           <h2 className="mb-6 font-display text-lg font-semibold text-foreground">Today's Progress</h2>
           <div className="flex flex-wrap items-center justify-around gap-6">
-            <ProgressRing value={calorieProgress} label="Calorie Goal" sublabel={`${caloriesIn} / ${user.dailyCalorieTarget}`} color={calorieProgress > 100 ? 'destructive' : 'primary'} />
+            <ProgressRing value={calorieProgress} label="Calorie Goal" sublabel={`${caloriesIn} / ${calorieTarget}`} color={calorieProgress > 100 ? 'destructive' : 'primary'} />
             <ProgressRing value={burnProgress} label="Burn Goal" sublabel={`${caloriesBurned} / 500 kcal`} color="secondary" />
             <ProgressRing value={consistencyProgress} label="Weekly Streak" sublabel={`${weeklyWorkouts} / 5 workouts`} color="primary" />
           </div>
@@ -144,7 +147,7 @@ export default function Dashboard() {
           />
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          {caloriesIn} / {user.dailyCalorieTarget} kcal consumed • Goal: {user.goal === 'gain' ? 'Weight Gain' : user.goal === 'lose' ? 'Weight Loss' : 'Maintain Weight'}
+          {caloriesIn} / {calorieTarget} kcal consumed • Goal: {user.goal === 'gain' ? 'Weight Gain' : user.goal === 'lose' ? 'Weight Loss' : 'Maintain Weight'}
         </p>
       </motion.div>
 

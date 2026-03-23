@@ -31,7 +31,12 @@ model DietEntry {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   foodName  String
+  quantity  String   @default("")
   calories  Int
+  protein   Float?
+  carbs     Float?
+  fat       Float?
+  fiber     Float?
   date      DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

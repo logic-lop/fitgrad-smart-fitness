@@ -61,7 +61,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await authAPI.login(email, password);
       const { token, user: userData } = response.data;
       localStorage.setItem('authToken', token);
-      setUser(userData);
+      
+      // Compute dailyCalorieTarget from user data
+      const profileWithTarget: UserProfile = {
+        ...userData,
+        dailyCalorieTarget: calculateCalorieTarget(
+          userData.weight, userData.height, userData.age, userData.goal
+        ),
+      };
+      
+      setUser(profileWithTarget);
       return true;
     } catch (err: any) {
       const message = err.response?.data?.error || 'Login failed';
@@ -79,7 +88,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await authAPI.register(email, password, name);
       const { token, user: userData } = response.data;
       localStorage.setItem('authToken', token);
-      setUser(userData);
+      
+      // Compute dailyCalorieTarget (will be default 2200 for new users)
+      const profileWithTarget: UserProfile = {
+        ...userData,
+        dailyCalorieTarget: calculateCalorieTarget(
+          userData.weight, userData.height, userData.age, userData.goal
+        ),
+      };
+      
+      setUser(profileWithTarget);
       return true;
     } catch (err: any) {
       const message = err.response?.data?.error || 'Registration failed';
@@ -114,11 +132,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         ...response.data,
       };
       
-      if (updates.weight || updates.height || updates.age || updates.goal) {
-        updated.dailyCalorieTarget = calculateCalorieTarget(
-          updated.weight, updated.height, updated.age, updated.goal
-        );
-      }
+      // Always recompute calorie target when profile is updated
+      updated.dailyCalorieTarget = calculateCalorieTarget(
+        updated.weight, updated.height, updated.age, updated.goal
+      );
+      
       setUser(updated);
     } catch (err: any) {
       const message = err.response?.data?.error || 'Update failed';
@@ -135,4 +153,3 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     </AuthContext.Provider>
   );
 };
-

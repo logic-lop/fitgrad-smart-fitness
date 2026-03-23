@@ -10,7 +10,7 @@ export default function Profile() {
   const [age, setAge] = useState(String(user?.age || 20));
   const [height, setHeight] = useState(String(user?.height || 170));
   const [weight, setWeight] = useState(String(user?.weight || 65));
-  const [goal, setGoal] = useState<'gain' | 'lose' | 'maintain'>(user?.goal || 'maintain');
+  const [goal, setGoal] = useState<'gain' | 'lose' | 'maintain'>((user?.goal as 'gain' | 'lose' | 'maintain') || 'maintain');
 
   useEffect(() => {
     if (user) {
@@ -18,13 +18,15 @@ export default function Profile() {
       setAge(String(user.age));
       setHeight(String(user.height));
       setWeight(String(user.weight));
-      setGoal(user.goal);
+      setGoal((user.goal as 'gain' | 'lose' | 'maintain') || 'maintain');
     }
   }, [user]);
 
   if (!user) return null;
 
-  const bmi = (user.weight / ((user.height / 100) ** 2)).toFixed(1);
+  const userWeight = user.weight || 65;
+  const userHeight = user.height || 170;
+  const bmi = (userWeight / ((userHeight / 100) ** 2)).toFixed(1);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();

@@ -40,7 +40,7 @@ export default function WorkoutTracker() {
       toast.error('Please fill all fields correctly');
       return;
     }
-    addWorkoutEntry({ date: today, type, duration: dur, caloriesBurned: cal });
+    addWorkoutEntry({ date: today, type, duration: dur, calories: cal });
     setDuration(''); setCaloriesBurned('');
     toast.success('Workout logged! 💪');
   };
@@ -49,7 +49,7 @@ export default function WorkoutTracker() {
     setEditingId(entry.id);
     setEditType(entry.type);
     setEditDur(String(entry.duration));
-    setEditCal(String(entry.caloriesBurned));
+    setEditCal(String(entry.calories));
   };
 
   const saveEdit = () => {
@@ -57,7 +57,7 @@ export default function WorkoutTracker() {
     const dur = parseInt(editDur);
     const cal = parseInt(editCal);
     if (isNaN(dur) || dur <= 0 || isNaN(cal) || cal <= 0) { toast.error('Invalid values'); return; }
-    updateWorkoutEntry(editingId, { type: editType, duration: dur, caloriesBurned: cal });
+    updateWorkoutEntry(editingId, { type: editType, duration: dur, calories: cal });
     setEditingId(null);
     toast.success('Updated!');
   };
@@ -184,7 +184,7 @@ export default function WorkoutTracker() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-foreground">{entry.caloriesBurned} kcal</span>
+                          <span className="text-sm font-semibold text-foreground">{entry.calories} kcal</span>
                           <button onClick={() => startEdit(entry)}
                             className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground">
                             <Pencil className="h-3.5 w-3.5" />
@@ -215,7 +215,7 @@ export default function WorkoutTracker() {
                         <p className="text-xs text-muted-foreground">{entry.duration} min • {entry.date}</p>
                       </div>
                     </div>
-                    <span className="text-sm font-semibold text-foreground">{entry.caloriesBurned} kcal</span>
+                    <span className="text-sm font-semibold text-foreground">{entry.calories} kcal</span>
                   </div>
                 ))}
               </div>

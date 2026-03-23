@@ -6,7 +6,12 @@ export interface DietEntry {
   id: string;
   date: string;
   foodName: string;
+  quantity: string;
   calories: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  fiber?: number;
 }
 
 export interface WorkoutEntry {
@@ -21,11 +26,14 @@ interface FitnessContextType {
   dietEntries: DietEntry[];
   workoutEntries: WorkoutEntry[];
   addDietEntry: (entry: Omit<DietEntry, 'id'>) => Promise<void>;
+  updateDietEntry: (id: string, updates: Partial<Omit<DietEntry, 'id' | 'date'>>) => Promise<void>;
   addWorkoutEntry: (entry: Omit<WorkoutEntry, 'id'>) => Promise<void>;
+  updateWorkoutEntry: (id: string, updates: Partial<Omit<WorkoutEntry, 'id' | 'date'>>) => Promise<void>;
   deleteDietEntry: (id: string) => Promise<void>;
   deleteWorkoutEntry: (id: string) => Promise<void>;
   getTodayCaloriesIn: () => number;
   getTodayCaloriesBurned: () => number;
+  getTodayNutrition: () => { protein: number; carbs: number; fat: number; fiber: number };
   getWeeklyData: () => { date: string; caloriesIn: number; caloriesBurned: number }[];
   getActiveDays: () => Set<string>;
   loadData: () => Promise<void>;
@@ -72,7 +80,12 @@ export const FitnessProvider = ({ children }: { children: ReactNode }) => {
         id: entry.id,
         date: new Date(entry.date).toISOString().split('T')[0],
         foodName: entry.foodName,
+        quantity: entry.quantity || '',
         calories: entry.calories,
+        protein: entry.protein,
+        carbs: entry.carbs,
+        fat: entry.fat,
+        fiber: entry.fiber,
       }));
 
       const workoutData = workoutRes.data.map((entry: any) => ({
@@ -98,19 +111,52 @@ export const FitnessProvider = ({ children }: { children: ReactNode }) => {
 
   const addDietEntry = async (entry: Omit<DietEntry, 'id'>) => {
     try {
-      const response = await dietAPI.add(
-        entry.foodName,
-        entry.calories,
-        entry.date
-      );
+      const response = await dietAPI.add({
+        foodName: entry.foodName,
+        quantity: entry.quantity,
+        calories: entry.calories,
+        protein: entry.protein,
+        carbs: entry.carbs,
+        fat: entry.fat,
+        fiber: entry.fiber,
+        date: entry.date,
+      });
       setDietEntries(prev => [...prev, {
         id: response.data.id,
         date: new Date(response.data.date).toISOString().split('T')[0],
         foodName: response.data.foodName,
+        quantity: response.data.quantity || '',
         calories: response.data.calories,
+        protein: response.data.protein,
+        carbs: response.data.carbs,
+        fat: response.data.fat,
+        fiber: response.data.fiber,
       }]);
     } catch (error) {
       console.error('Failed to add diet entry:', error);
+      throw error;
+    }
+  };
+
+  const updateDietEntry = async (id: string, updates: Partial<Omit<DietEntry, 'id' | 'date'>>) => {
+    try {
+      const response = await dietAPI.update(id, updates);
+      setDietEntries(prev => prev.map(e =>
+        e.id === id
+          ? {
+              ...e,
+              foodName: response.data.foodName,
+              quantity: response.data.quantity || '',
+              calories: response.data.calories,
+              protein: response.data.protein,
+              carbs: response.data.carbs,
+              fat: response.data.fat,
+              fiber: response.data.fiber,
+            }
+          : e
+      ));
+    } catch (error) {
+      console.error('Failed to update diet entry:', error);
       throw error;
     }
   };
@@ -132,6 +178,25 @@ export const FitnessProvider = ({ children }: { children: ReactNode }) => {
       }]);
     } catch (error) {
       console.error('Failed to add workout entry:', error);
+      throw error;
+    }
+  };
+
+  const updateWorkoutEntry = async (id: string, updates: Partial<Omit<WorkoutEntry, 'id' | 'date'>>) => {
+    try {
+      const response = await workoutAPI.update(id, updates);
+      setWorkoutEntries(prev => prev.map(e =>
+        e.id === id
+          ? {
+              ...e,
+              type: response.data.type,
+              duration: response.data.duration,
+              calories: response.data.calories,
+            }
+          : e
+      ));
+    } catch (error) {
+      console.error('Failed to update workout entry:', error);
       throw error;
     }
   };
@@ -162,6 +227,16 @@ export const FitnessProvider = ({ children }: { children: ReactNode }) => {
   const getTodayCaloriesBurned = () =>
     workoutEntries.filter(e => e.date === todayStr()).reduce((sum, e) => sum + e.calories, 0);
 
+  const getTodayNutrition = () => {
+    const todayDiet = dietEntries.filter(e => e.date === todayStr());
+    return {
+      protein: todayDiet.reduce((s, e) => s + (e.protein || 0), 0),
+      carbs: todayDiet.reduce((s, e) => s + (e.carbs || 0), 0),
+      fat: todayDiet.reduce((s, e) => s + (e.fat || 0), 0),
+      fiber: todayDiet.reduce((s, e) => s + (e.fiber || 0), 0),
+    };
+  };
+
   const getWeeklyData = () => {
     const days = getLast7Days();
     return days.map(date => ({
@@ -179,12 +254,11 @@ export const FitnessProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <FitnessContext.Provider value={{
-      dietEntries, workoutEntries, addDietEntry, addWorkoutEntry,
+      dietEntries, workoutEntries, addDietEntry, updateDietEntry, addWorkoutEntry, updateWorkoutEntry,
       deleteDietEntry, deleteWorkoutEntry, getTodayCaloriesIn, getTodayCaloriesBurned,
-      getWeeklyData, getActiveDays, loadData, isLoading,
+      getTodayNutrition, getWeeklyData, getActiveDays, loadData, isLoading,
     }}>
       {children}
     </FitnessContext.Provider>
   );
 };
-

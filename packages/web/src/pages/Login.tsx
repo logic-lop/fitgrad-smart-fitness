@@ -17,7 +17,7 @@ export default function Login() {
       const result = await login(email, password);
       if (result) {
         toast.success('Welcome back!');
-        navigate('/onboarding', { replace: true });
+        navigate('/dashboard', { replace: true });
       } else {
         toast.error('Invalid email or password');
       }

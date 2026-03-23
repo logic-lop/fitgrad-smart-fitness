@@ -124,4 +124,7 @@
     backdrop-filter: blur(12px);
     background: hsl(0 0% 100% / 0.8);
   }
+  .dark .glass {
+    background: hsl(220 25% 8% / 0.8);
+  }
 }
