@@ -23,8 +23,6 @@ export default function Register() {
       if (result) {
         toast.success('Account created! Let\'s set up your profile.');
         navigate('/onboarding', { replace: true });
-      } else {
-        toast.error('An account with this email already exists');
       }
     } catch (err: any) {
       toast.error(err.message || 'Registration failed');

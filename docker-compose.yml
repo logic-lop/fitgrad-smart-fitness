@@ -1,21 +1,10 @@
-version: '3.8'
-
 services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: fitgrad
-      POSTGRES_PASSWORD: fitgrad123
-      POSTGRES_DB: fitgrad
+  mongodb:
+    image: mongodb/mongodb-community-server:7.0-ubuntu2204
+    container_name: fitgrad-mongodb
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U fitgrad"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "27017:27017"
 
 volumes:
-  postgres_data:
+  mongodb_data:
