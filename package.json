@@ -13,7 +13,6 @@
     "studio": "npx prisma studio --schema packages/api/prisma/schema.prisma",
     "db:push": "npx prisma db push --schema packages/api/prisma/schema.prisma",
     "build": "concurrently \"npm --prefix packages/web run build\" \"npm --prefix packages/api run build\"",
-    "postinstall": "npm --prefix packages/api run build",
     "lint": "npm --prefix packages/web run lint",
     "test": "npm --prefix packages/web run test",
     "test:watch": "npm --prefix packages/web run test:watch"
